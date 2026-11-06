@@ -827,35 +827,18 @@
 
     function handleStudentStart(event) {
         event.preventDefault();
-        const form = document.getElementById('student-login-form');
         studentNameData = document.getElementById('fullname').value.trim();
         studentGroupData = document.getElementById('group').value;
-        const btnText = document.getElementById('start-btn-text');
 
         if (!studentNameData || !studentGroupData) return;
 
-        btnText.innerText = "Connecting...";
+        document.getElementById('display-student-name').innerText = studentNameData;
+        document.getElementById('display-student-group').innerText = studentGroupData;
 
-        fetch("https://api.web3forms.com/submit", {
-            method: "POST",
-            body: new FormData(form)
-        })
-        .then(res => res.json())
-        .then(data => {
-            console.log("Web3Forms response:", data);
-        })
-        .catch(err => {
-            console.error("Web3Forms error:", err);
-        })
-        .finally(() => {
-            document.getElementById('display-student-name').innerText = studentNameData;
-            document.getElementById('display-student-group').innerText = studentGroupData;
+        document.getElementById('welcome-screen').style.display = 'none';
+        document.getElementById('app-screen').style.display = 'block';
 
-            document.getElementById('welcome-screen').style.display = 'none';
-            document.getElementById('app-screen').style.display = 'block';
-
-            loadQuestion('g');
-        });
+        loadQuestion('g');
     }
 
     function switchTab(tab) {
@@ -1040,8 +1023,16 @@
         })
         .then(res => res.json())
         .then(data => {
-            statusDiv.style.color = 'var(--correct)';
-            statusDiv.innerText = "Results successfully sent to teacher Youssef!";
+            document.body.style.backgroundColor = '#ffffff';
+            document.body.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; text-align: center; font-family: system-ui, -apple-system, sans-serif; padding: 20px;">
+                    <h1 style="color: #1e3a8a; font-size: 2.5rem; margin-bottom: 15px;">Thank you!</h1>
+                    <p style="color: #475569; font-size: 1.5rem; margin-bottom: 30px;">See you soon in class!</p>
+                    <div style="color: #16a34a; font-weight: bold; font-size: 1.1rem; background: #dcfce7; border: 1px solid #16a34a; padding: 12px 24px; border-radius: 8px;">
+                        ✓ Your results have been successfully submitted to Mr. Youssef.
+                    </div>
+                </div>
+            `;
         })
         .catch(err => {
             statusDiv.style.color = 'var(--wrong)';
