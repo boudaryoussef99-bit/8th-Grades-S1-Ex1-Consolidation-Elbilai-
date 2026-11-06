@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consolidation & Review Game - Elbilia Skolar Bernoussi</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --accent: #2563eb;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --border: #cbd5e1;
+            --correct: #16a34a;
+            --wrong: #dc2626;
+            --warning: #d97706;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .game-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Welcome Screen Styling */
+        #welcome-screen {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08);
+            max-width: 550px;
+            margin: 40px auto;
+        }
+
+        .welcome-logo {
+            width: 260px;
+            height: auto;
+            margin: 0 auto 20px auto;
+            display: block;
+        }
+
+        .welcome-logo svg {
+            width: 100%;
+            height: auto;
+        }
+
+        .teacher-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 25px;
+        }
+
+        .welcome-msg h2 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin: 0 0 10px 0;
+        }
+
+        .welcome-msg p {
+            color: #64748b;
+            font-size: 1.05rem;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .student-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            text-align: left;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .form-group input, .form-group select {
+            padding: 12px 15px;
+            font-size: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--accent);
+        }
+
+        .start-btn {
+            background: var(--primary);
+            color: white;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+
+        .start-btn:hover {
+            background: var(--accent);
+        }
+
+        /* App Layout (Hidden by default) */
+        #app-screen {
+            display: none;
+        }
+
+        header {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-container {
+            width: 140px;
+            height: auto;
+        }
+
+        .logo-container svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .header-title h1 {
+            font-size: 1.25rem;
+            color: var(--primary);
+            margin: 0 0 4px 0;
+        }
+
+        .header-title p {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin: 0;
+        }
+
+        .student-badge {
+            background: #eff6ff;
+            color: var(--accent);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border: 1px solid #bfdbfe;
+            text-align: right;
+        }
+
+        /* Scoreboard */
+        .scoreboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .team-card {
+            background: var(--card);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .team-card.active {
+            border-color: var(--accent);
+            background: #eff6ff;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+        }
+
+        .team-card h3 {
+            margin: 0 0 5px 0;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .team-card .score {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        /* Nav Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 12px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            color: #64748b;
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Question Box */
+        .card {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .q-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #64748b;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .q-text {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .opt-btn {
+            padding: 15px;
+            background: #f8fafc;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            text-align: left;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.15s;
+        }
+
+        .opt-btn.hover:not(:disabled) {
+            background: #e2e8f0;
+            border-color: #94a3b8;
+        }
+
+        .opt-btn.correct {
+            background: #dcfce7 !important;
+            border-color: var(--correct) !important;
+            color: #166534;
+            font-weight: bold;
+        }
+
+        .opt-btn.wrong {
+            background: #fee2e2 !important;
+            border-color: var(--wrong) !important;
+            color: #991b1b;
+        }
+
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        /* Reading Text & Input Elements */
+        .reading-text-box {
+            background: #f8fafc;
+            padding: 18px 22px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+            max-height: 220px;
+            overflow-y: auto;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .reading-text-box h4 {
+            margin: 0 0 10px 0;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .typing-container {
+            margin-bottom: 20px;
+        }
+
+        .typing-input {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .typing-input:focus {
+            border-color: var(--accent);
+        }
+
+        .feedback-box {
+            margin-top: 12px;
+            padding: 14px 18px;
+            border-radius: 8px;
+            font-size: 1rem;
+            line-height: 1.5;
+            display: block;
+        }
+
+        .feedback-box.correct {
+            background-color: #dcfce7 !important;
+            border: 2px solid #16a34a !important;
+            color: #166534 !important;
+        }
+
+        .feedback-box.warning {
+            background-color: #fef3c7 !important;
+            border: 2px solid #d97706 !important;
+            color: #92400e !important;
+        }
+
+        .feedback-box.wrong {
+            background-color: #fee2e2 !important;
+            border: 2px solid #dc2626 !important;
+            color: #991b1b !important;
+        }
+
+        /* Writing Box */
+        .writing-prompt {
+            background: #f1f5f9;
+            padding: 15px;
+            border-left: 4px solid var(--accent);
+            border-radius: 6px;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        textarea {
+            width: 100%;
+            height: 140px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        .word-count {
+            text-align: right;
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 5px;
+        }
+
+        /* MOBILE RESPONSIVENESS FIXES */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .header-left {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .student-badge {
+                text-align: left;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            .scoreboard {
+                grid-template-columns: 1fr;
+            }
+            .tabs {
+                flex-direction: column;
+            }
+            .tab-btn {
+                min-width: 100%;
+            }
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            .card {
+                padding: 15px;
+            }
+            .nav-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .nav-controls button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+
+    <!-- WELCOME LANDING SCREEN -->
+    <div id="welcome-screen">
+        <div class="welcome-logo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 104" role="img" aria-label="elbilia skolar">
+              <g>
+                <g transform="translate(4 7) rotate(-13 39 39)">
+                  <rect x="0"  y="0"  width="23" height="23" fill="#037CC0"/>
+                  <rect x="24" y="0"  width="23" height="23" fill="#037CC0"/>
+                  <rect x="48" y="0"  width="23" height="23" fill="#6C7074"/>
+                  <rect x="0"  y="24" width="23" height="23" fill="#037CC0"/>
+                  <rect x="24" y="24" width="23" height="23" fill="#A1A6AA"/>
+                  <rect x="48" y="24" width="23" height="23" fill="#037CC0"/>
+                  <rect x="0"  y="48" width="23" height="23" fill="#A1A6AA"/>
+                  <rect x="24" y="48" width="23" height="23" fill="#037CC0"/>
+                  <rect x="48" y="48" width="23" height="23" fill="#037CC0"/>
+                  <path d="M0 0H71V71H0Z" fill="none" stroke="#037CC0" stroke-width=".6" opacity=".35"/>
+                </g>
+                <text x="103" y="76" font-family="Arial, Helvetica, sans-serif" font-size="68" font-weight="700" letter-spacing="-3.2" fill="#037CC0">elbilia</text>
+                <text x="312" y="76" font-family="Arial, Helvetica, sans-serif" font-size="39" font-style="italic" font-weight="700" letter-spacing="-1.8" fill="#6C7074">skolar</text>
+                <text x="108" y="99" font-family="Arial, Helvetica, sans-serif" font-size="10.5" font-weight="700" letter-spacing="1.2" fill="#6C7074">pre-school  primary  college  high school</text>
+              </g>
+            </svg>
+        </div>
+        <div class="teacher-title">Teacher: Youssef Boudar</div>
+
+        <div class="welcome-msg">
+            <h2>Hello and Welcome</h2>
+            <p>Are you ready to review for the exam?</p>
+        </div>
+
+        <form id="student-login-form" class="student-form" onsubmit="handleStudentStart(event)">
+            <input type="hidden" name="access_key" value="0a0f72a0-7679-4600-abcf-9ebd68532b29">
+            <input type="hidden" name="subject" value="New Student Started Review Game - Elbilia Skolar">
+
+            <div class="form-group">
+                <label for="fullname">Full Name:</label>
+                <input type="text" id="fullname" name="Full_Name" required placeholder="e.g. Adam Bennani">
+            </div>
+
+            <div class="form-group">
+                <label for="group">Group / Class:</label>
+                <select id="group" name="Student_Group" required>
+                    <option value="" disabled selected>Select your group...</option>
+                    <option value="Group 1">Group 1</option>
+                    <option value="Group 2">Group 2</option>
+                    <option value="Group 3">Group 3</option>
+                    <option value="Group 4">Group 4</option>
+                </select>
+            </div>
+
+            <button type="submit" class="start-btn" id="start-btn-text">Start Review Game</button>
+        </form>
+    </div>
+
+    <!-- MAIN APP SCREEN -->
+    <div id="app-screen">
+        <header>
+            <div class="header-left">
+                <div class="logo-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 104" role="img" aria-label="elbilia skolar">
+                      <g>
+                        <g transform="translate(4 7) rotate(-13 39 39)">
+                          <rect x="0"  y="0"  width="23" height="23" fill="#037CC0"/>
+                          <rect x="24" y="0"  width="23" height="23" fill="#037CC0"/>
+                          <rect x="48" y="0"  width="23" height="23" fill="#6C7074"/>
+                          <rect x="0"  y="24" width="23" height="23" fill="#037CC0"/>
+                          <rect x="24" y="24" width="23" height="23" fill="#A1A6AA"/>
+                          <rect x="48" y="24" width="23" height="23" fill="#037CC0"/>
+                          <rect x="0"  y="48" width="23" height="23" fill="#A1A6AA"/>
+                          <rect x="24" y="48" width="23" height="23" fill="#037CC0"/>
+                          <rect x="48" y="48" width="23" height="23" fill="#037CC0"/>
+                          <path d="M0 0H71V71H0Z" fill="none" stroke="#037CC0" stroke-width=".6" opacity=".35"/>
+                        </g>
+                        <text x="103" y="76" font-family="Arial, Helvetica, sans-serif" font-size="68" font-weight="700" letter-spacing="-3.2" fill="#037CC0">elbilia</text>
+                        <text x="312" y="76" font-family="Arial, Helvetica, sans-serif" font-size="39" font-style="italic" font-weight="700" letter-spacing="-1.8" fill="#6C7074">skolar</text>
+                        <text x="108" y="99" font-family="Arial, Helvetica, sans-serif" font-size="10.5" font-weight="700" letter-spacing="1.2" fill="#6C7074">pre-school  primary  college  high school</text>
+                      </g>
+                    </svg>
+                </div>
+                <div class="header-title">
+                    <h1>Consolidation & Review Game</h1>
+                    <p>Elbilia Skolar Bernoussi | 8th Grade</p>
+                </div>
+            </div>
+            <div class="student-badge">
+                <div id="display-student-name" style="font-weight: 700; color: var(--primary);">Student Name</div>
+                <div id="display-student-group" style="font-size: 0.75rem; color: #64748b;">Group</div>
+            </div>
+        </header>
+
+        <!-- Scoreboard / Turn Selector -->
+        <div class="scoreboard">
+            <div class="team-card active" id="team1-box" onclick="switchTeam(1)">
+                <h3>TEAM 1 (Click to Play)</h3>
+                <div class="score" id="score1">0</div>
+            </div>
+            <div class="team-card" id="team2-box" onclick="switchTeam(2)">
+                <h3>TEAM 2 (Click to Play)</h3>
+                <div class="score" id="score2">0</div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('grammar')">Grammar</button>
+            <button class="tab-btn" onclick="switchTab('vocab')">Vocabulary</button>
+            <button class="tab-btn" onclick="switchTab('reading')">Reading Comp</button>
+            <button class="tab-btn" onclick="switchTab('writing')">Writing Task</button>
+        </div>
+
+        <!-- GRAMMAR PANEL -->
+        <div id="grammar-panel" class="card panel">
+            <div class="q-info">
+                <span id="g-counter">Question 1 of 15</span>
+                <span id="g-category" style="color: var(--accent);">Past Simple</span>
+            </div>
+            <div class="q-text" id="g-question">Loading question...</div>
+            <div class="options-grid" id="g-options"></div>
+            <div class="nav-controls">
+                <button class="btn" id="g-prev" onclick="moveQ('g', -1)">Previous</button>
+                <button class="btn" id="g-next" onclick="moveQ('g', 1)">Next Question</button>
+            </div>
+        </div>
+
+        <!-- VOCABULARY PANEL -->
+        <div id="vocab-panel" class="card panel" style="display: none;">
+            <div class="q-info">
+                <span id="v-counter">Question 1 of 15</span>
+                <span id="v-category" style="color: var(--accent);">Synonyms</span>
+            </div>
+            <div class="q-text" id="v-question">Loading question...</div>
+            <div class="options-grid" id="v-options"></div>
+            <div class="nav-controls">
+                <button class="btn" id="v-prev" onclick="moveQ('v', -1)">Previous</button>
+                <button class="btn" id="v-next" onclick="moveQ('v', 1)">Next Question</button>
+            </div>
+        </div>
+
+        <!-- READING PANEL (Passages with exact targeted fill-in words mentioned) -->
+        <div id="reading-panel" class="card panel" style="display: none;">
+            <div class="reading-text-box">
+                <h4>Reading Text: Practice Passages</h4>
+                <p><strong>The Secret in the Sand:</strong> In 2023, a teenager named Ethan found a plastic bottle on a beach in Miami, USA. Inside was a piece of paper with a letter dated 15 July 2010. The letter was written by a boy named Noah, aged 13, from Boston, Massachusetts. The letter asked if anyone would ever find it and requested the finder to contact his school address. Noah was 26 years old when Ethan was able to contact him through social media. Ethan found the bottle only a few miles away from where Noah had dropped it into the ocean years earlier.</p>
+                <p><strong>A Message Across the Sea:</strong> In 2021, Sophia Martinez was walking along a rocky shore in Sydney, Australia, when she spotted a waterproof pouch. Inside was a postcard written in Spanish from an eight-year-old girl named Sofia from Madrid, Spain, thousands of kilometres away. She was looking for a penpal to practice writing. After the local radio broadcasted the story, the girl's family reached out to Sophia. Sofia (the writer) was now eleven years old and living in Valencia, Spain.</p>
+            </div>
+            <div class="q-info">
+                <span id="r-counter">Question 1 of 17</span>
+                <span id="r-category" style="color: var(--accent);">Reading Comprehension</span>
+            </div>
+            <div class="q-text" id="r-question">Loading question...</div>
+
+            <!-- Typed Answer Section -->
+            <div class="typing-container">
+                <input type="text" id="r-input" class="typing-input" placeholder="Type your answer here and press Enter or Submit...">
+                <div id="r-feedback" class="feedback-box" style="display: none;"></div>
+            </div>
+
+            <div class="nav-controls">
+                <button class="btn" id="r-prev" onclick="moveQ('r', -1)">Previous</button>
+                <button class="btn" id="r-submit" onclick="checkReadingAnswer()" style="background: var(--correct);">Submit Answer</button>
+                <button class="btn" id="r-next" onclick="moveQ('r', 1)">Next Question</button>
+            </div>
+        </div>
+
+        <!-- WRITING PANEL -->
+        <div id="writing-panel" class="card panel" style="display: none;">
+            <h3 style="color: var(--primary); margin-top:0;">Writing Task: Memory Capsules</h3>
+            <div class="writing-prompt">
+                <strong>Read the message from your partner and write a reply:</strong><br><br>
+                <em>"Hi! I remember your class made a wonderful time capsule last term. Our group is designing one this week, and we need your advice! What special items did you include inside, what kind of container did you use, and where did you hide it so nobody would find it?"</em>
+            </div>
+            <textarea id="writing-input" placeholder="Type your response here..." oninput="countWords()"></textarea>
+            <div class="word-count" id="word-counter">Words: 0</div>
+            
+            <div style="margin-top: 20px; text-align: right;">
+                <button class="btn" onclick="submitAllResults()" style="background: var(--primary); padding: 12px 24px; font-size: 1rem;">Submit Final Results to Teacher</button>
+            </div>
+            <div id="submission-status" style="margin-top: 10px; font-weight: bold; text-align: right; display: none;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const grammarData = [
+        { q: "Lucas _______ (visit) a lake near Lyon when he found the watch.", opts: ["visited", "visiting", "was visit", "visits"], a: 0, cat: "Past Simple" },
+        { q: "My sister _______ (not have) many books at home when she was young.", opts: ["didn't had", "didn't have", "wasn't have", "don't have"], a: 1, cat: "Past Simple" },
+        { q: "Past form of 'hide': They _______ the container under the garden floor.", opts: ["hided", "hid", "hidden", "was hide"], a: 1, cat: "Irregular Verbs" },
+        { q: "Past form of 'lose': Pierre _______ his pocket watch during a river crossing.", opts: ["losed", "lost", "was lose", "loosen"], a: 1, cat: "Irregular Verbs" },
+        { q: "_______ you borrow that history book from the library?", opts: ["Were", "Did", "Was", "Have"], a: 1, cat: "Past Questions" },
+        { q: "Past form of 'make': We _______ a time capsule in class last week.", opts: ["maked", "make", "made", "was make"], a: 2, cat: "Irregular Verbs" },
+        { q: "Past form of 'send': He _______ an email to the museum yesterday.", opts: ["sended", "sent", "send", "was send"], a: 1, cat: "Irregular Verbs" },
+        { q: "Arthur _______ his dog when he discovered the gold ring.", opts: ["was walking", "walked", "were walking", "is walking"], a: 0, cat: "Past Continuous" },
+        { q: "While we _______ football in the yard, it started to rain.", opts: ["played", "were playing", "was playing", "are playing"], a: 1, cat: "Past Continuous" },
+        { q: "There _______ any cars in York back in ancient times.", opts: ["wasn't", "weren't", "isn't", "not were"], a: 1, cat: "Was / Were" },
+        { q: "_______ there a small museum in this town fifty years ago?", opts: ["Were", "Was", "Did", "Is"], a: 1, cat: "Was / Were" },
+        { q: "There are _______ students in the school yard right now.", opts: ["much", "a lot of", "any", "a little"], a: 1, cat: "Quantifiers" },
+        { q: "Did you buy _______ gold ring at the local shop?", opts: ["any", "some", "many", "a few"], a: 0, cat: "Quantifiers" },
+        { q: "How _______ time did you spend finishing your homework?", opts: ["many", "much", "few", "any"], a: 1, cat: "Quantifiers" },
+        { q: "Let's _______ a secret message inside the glass bottle!", opts: ["create", "creating", "to create", "created"], a: 0, cat: "Suggestions" }
+    ];
+
+    const vocabData = [
+        { q: "Something that is very big can be described as _______.", opts: ["bright", "enormous", "unusual", "pretty"], a: 1, cat: "Synonyms" },
+        { q: "An adjective that means 'different or surprising':", opts: ["unusual", "colourful", "terrible", "awful"], a: 0, cat: "Definitions" },
+        { q: "Which word is a synonym for 'brilliant'?", opts: ["awful", "excellent", "huge", "strange"], a: 1, cat: "Synonyms" },
+        { q: "'Awful' has a similar meaning to _______.", opts: ["terrible", "incredible", "pretty", "enormous"], a: 0, cat: "Synonyms" },
+        { q: "Nice to look at is the definition of _______.", opts: ["pretty", "awful", "strange", "enormous"], a: 0, cat: "Synonyms" },
+        { q: "Carmen plays the piano and violin frequently. She is a fine _______.", opts: ["sculptor", "musician", "painter", "designer"], a: 1, cat: "Art & Artists" },
+        { q: "Emma takes high-quality photos. She works as a _______.", opts: ["photographer", "sculptor", "dancer", "painter"], a: 0, cat: "Art & Artists" },
+        { q: "Street art, statues, and 3D artwork are created by a _______.", opts: ["sculptor", "musician", "writer", "dancer"], a: 0, cat: "Art & Artists" },
+        { q: "Someone who creates logos, graphics, and clothes is a _______.", opts: ["designer", "painter", "musician", "sculptor"], a: 0, cat: "Art & Artists" },
+        { q: "What is the opposite of the verb 'borrow'?", opts: ["spend", "lend", "receive", "lose"], a: 1, cat: "Verbs & Opposites" },
+        { q: "What is the opposite of 'save' money?", opts: ["spend", "buy", "win", "lend"], a: 0, cat: "Verbs & Opposites" },
+        { q: "How do you feel when you have a difficult exam tomorrow?", opts: ["relaxed", "worried", "bored", "annoyed"], a: 1, cat: "Feelings" },
+        { q: "You suddenly see your best friend live on TV! You are _______.", opts: ["surprised", "bored", "relaxed", "unhappy"], a: 0, cat: "Feelings" },
+        { q: "A strong box or container used to keep items safely:", opts: ["cupboard", "container", "paper", "jar"], a: 1, cat: "Time Capsules" },
+        { q: "To put something in a secret place where nobody can see it:", opts: ["hide", "close", "appear", "include"], a: 0, cat: "Time Capsules" }
+    ];
+
+    // READING QUESTIONS WITH ANSWERS 100% FOUND IN THE TEXT
+    const readingData = [
+        { 
+            q: "Task 1: Who is from Boston, Massachusetts?", 
+            keywords: ["Noah"], 
+            suggested: "Noah", 
+            isName: true,
+            cat: "Task 1: Matching Names"
+        },
+        { 
+            q: "Task 1: Who found the plastic bottle on a beach in Miami in 2023?", 
+            keywords: ["Ethan"], 
+            suggested: "Ethan", 
+            isName: true,
+            cat: "Task 1: Matching Names"
+        },
+        { 
+            q: "Task 1: Who wrote the postcard in Spanish from Spain?", 
+            keywords: ["Sofia"], 
+            suggested: "Sofia", 
+            isName: true,
+            cat: "Task 1: Matching Names"
+        },
+        { 
+            q: "Task 1: Who found the waterproof pouch in Sydney, Australia?", 
+            keywords: ["Sophia Martinez", "Sophia"], 
+            suggested: "Sophia Martinez", 
+            isName: true,
+            cat: "Task 1: Matching Names"
+        },
+        { 
+            q: "Task 2: Miami is a city in the USA by the Atlantic O_______.", 
+            keywords: ["Ocean"], 
+            suggested: "Ocean", 
+            isName: false,
+            cat: "Task 2: Text Vocabulary"
+        },
+        { 
+            q: "Task 2: Can you tell me the best way to c_______ him? Is it better to send a message or call?", 
+            keywords: ["contact"], 
+            suggested: "contact", 
+            isName: false,
+            cat: "Task 2: Text Vocabulary"
+        },
+        { 
+            q: "Task 2: Be careful! That bottle is made of p_______, not glass.", 
+            keywords: ["plastic"], 
+            suggested: "plastic", 
+            isName: false,
+            cat: "Task 2: Text Vocabulary"
+        },
+        { 
+            q: "Task 2: I need a piece of p_______ to write down my notes.", 
+            keywords: ["paper"], 
+            suggested: "paper", 
+            isName: false,
+            cat: "Task 2: Text Vocabulary"
+        },
+        { 
+            q: "Task 2: Students usually bring their own water b_______ to school.", 
+            keywords: ["bottle", "bottles"], 
+            suggested: "bottle", 
+            isName: false,
+            cat: "Task 2: Text Vocabulary"
+        },
+        { 
+            q: "Task 2: Sydney is a famous city in A_______.", 
+            keywords: ["Australia"], 
+            suggested: "Australia", 
+            isName: true,
+            cat: "Task 2: Text Vocabulary"
+        },
+        { 
+            q: "Task 3 (T/F/NG): Ethan found the plastic bottle in 2021. (Type True, False, or Not Given)", 
+            keywords: ["False", "false"], 
+            suggested: "False (He found it in 2023)", 
+            isName: false,
+            cat: "Task 3: True / False / NG"
+        },
+        { 
+            q: "Task 3 (T/F/NG): Noah put his letter in a plastic bottle. (Type True, False, or Not Given)", 
+            keywords: ["True", "true"], 
+            suggested: "True", 
+            isName: false,
+            cat: "Task 3: True / False / NG"
+        },
+        { 
+            q: "Task 3 (T/F/NG): Noah's letter travelled across the world to another continent. (Type True, False, or Not Given)", 
+            keywords: ["False", "false"], 
+            suggested: "False (It was found a few miles away in Miami)", 
+            isName: false,
+            cat: "Task 3: True / False / NG"
+        },
+        { 
+            q: "Task 3 (T/F/NG): Sophia Martinez was riding a bicycle when she found the pouch. (Type True, False, or Not Given)", 
+            keywords: ["False", "false"], 
+            suggested: "False (She was walking along a rocky shore)", 
+            isName: false,
+            cat: "Task 3: True / False / NG"
+        },
+        { 
+            q: "Task 3 (T/F/NG): Sofia (the writer) is from Madrid, Spain. (Type True, False, or Not Given)", 
+            keywords: ["True", "true"], 
+            suggested: "True", 
+            isName: false,
+            cat: "Task 3: True / False / NG"
+        },
+        { 
+            q: "Task 4 (Open Answer): Do you know any other real stories about people finding messages in bottles?", 
+            keywords: ["yes", "no", "story", "found", "find", "know", "friend", "beach"], 
+            suggested: "Yes, I heard a story about a fisherman who found an old letter on the beach.", 
+            isName: false,
+            cat: "Task 4: Open Sentence Response"
+        },
+        { 
+            q: "Task 4 (Open Answer): Did you write a message and put it in a bottle when you were younger? What would you write?", 
+            keywords: ["would", "like", "write", "message", "bottle", "yes", "no", "name"], 
+            suggested: "I would like to write a message saying hello and put my email address inside.", 
+            isName: false,
+            cat: "Task 4: Open Sentence Response"
+        }
+    ];
+
+    let gIndex = 0;
+    let vIndex = 0;
+    let rIndex = 0;
+    let activeTeam = 1;
+    let scores = { 1: 0, 2: 0 };
+    let wrongAttempts = {};
+    let studentNameData = "";
+    let studentGroupData = "";
+
+    function handleStudentStart(event) {
+        event.preventDefault();
+        const form = document.getElementById('student-login-form');
+        studentNameData = document.getElementById('fullname').value.trim();
+        studentGroupData = document.getElementById('group').value;
+        const btnText = document.getElementById('start-btn-text');
+
+        if (!studentNameData || !studentGroupData) return;
+
+        btnText.innerText = "Connecting...";
+
+        fetch("https://api.web3forms.com/submit", {
+            method: "POST",
+            body: new FormData(form)
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log("Web3Forms response:", data);
+        })
+        .catch(err => {
+            console.error("Web3Forms error:", err);
+        })
+        .finally(() => {
+            document.getElementById('display-student-name').innerText = studentNameData;
+            document.getElementById('display-student-group').innerText = studentGroupData;
+
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('app-screen').style.display = 'block';
+
+            loadQuestion('g');
+        });
+    }
+
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
+        
+        if(tab === 'grammar') {
+            document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            document.getElementById('grammar-panel').style.display = 'block';
+            loadQuestion('g');
+        } else if(tab === 'vocab') {
+            document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            document.getElementById('vocab-panel').style.display = 'block';
+            loadQuestion('v');
+        } else if(tab === 'reading') {
+            document.querySelectorAll('.tab-btn')[2].classList.add('active');
+            document.getElementById('reading-panel').style.display = 'block';
+            loadQuestion('r');
+        } else {
+            document.querySelectorAll('.tab-btn')[3].classList.add('active');
+            document.getElementById('writing-panel').style.display = 'block';
+        }
+    }
+
+    function switchTeam(team) {
+        activeTeam = team;
+        document.getElementById('team1-box').classList.toggle('active', team === 1);
+        document.getElementById('team2-box').classList.toggle('active', team === 2);
+    }
+
+    function loadQuestion(type) {
+        const isG = type === 'g';
+        const isV = type === 'v';
+        const data = isG ? grammarData : (isV ? vocabData : readingData);
+        const idx = isG ? gIndex : (isV ? vIndex : rIndex);
+        const q = data[idx];
+
+        document.getElementById(`${type}-counter`).innerText = `Question ${idx + 1} of ${data.length}`;
+        document.getElementById(`${type}-category`).innerText = q.cat;
+        document.getElementById(`${type}-question`).innerText = q.q;
+
+        if (isG || isV) {
+            const grid = document.getElementById(`${type}-options`);
+            grid.innerHTML = '';
+            q.opts.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                btn.innerText = opt;
+                btn.onclick = () => checkAns(type, i, q.a, btn);
+                grid.appendChild(btn);
+            });
+            document.getElementById(`${type}-prev`).disabled = idx === 0;
+            document.getElementById(`${type}-next`).disabled = idx === data.length - 1;
+        } else {
+            const inputElem = document.getElementById('r-input');
+            const feedbackElem = document.getElementById('r-feedback');
+            
+            inputElem.value = '';
+            feedbackElem.style.display = 'none';
+            feedbackElem.className = 'feedback-box';
+            feedbackElem.innerHTML = '';
+
+            document.getElementById('r-prev').disabled = idx === 0;
+            document.getElementById('r-next').disabled = idx === data.length - 1;
+        }
+    }
+
+    function checkAns(type, selected, correct, btn) {
+        const grid = document.getElementById(`${type}-options`);
+        const buttons = grid.querySelectorAll('.opt-btn');
+        
+        buttons.forEach(b => b.style.pointerEvents = 'none');
+
+        if(selected === correct) {
+            btn.classList.add('correct');
+            scores[activeTeam] += 10;
+            document.getElementById(`score${activeTeam}`).innerText = scores[activeTeam];
+        } else {
+            btn.classList.add('wrong');
+            buttons[correct].classList.add('correct');
+        }
+    }
+
+    function checkReadingAnswer() {
+        const inputElem = document.getElementById('r-input');
+        const feedbackElem = document.getElementById('r-feedback');
+        const userText = inputElem.value.trim();
+        const currentQ = readingData[rIndex];
+        
+        if (!userText) {
+            feedbackElem.style.display = 'block';
+            feedbackElem.className = 'feedback-box warning';
+            feedbackElem.innerHTML = '<strong>Please type an answer first!</strong>';
+            return;
+        }
+
+        if (!wrongAttempts[rIndex]) wrongAttempts[rIndex] = 0;
+
+        let hasKeyword = false;
+        let matchedKeyword = "";
+        
+        for (let kw of currentQ.keywords) {
+            if (userText.toLowerCase().includes(kw.toLowerCase())) {
+                hasKeyword = true;
+                matchedKeyword = kw;
+                break;
+            }
+        }
+
+        feedbackElem.style.display = 'block';
+
+        if (hasKeyword) {
+            let isCapitalized = true;
+            if (currentQ.isName) {
+                const regex = new RegExp(matchedKeyword, 'gi');
+                const match = userText.match(regex);
+                if (match && match[0][0] !== match[0][0].toUpperCase()) {
+                    isCapitalized = false;
+                }
+            }
+
+            if (!isCapitalized) {
+                feedbackElem.className = 'feedback-box warning';
+                feedbackElem.innerHTML = `<strong>Good job, but remember!</strong> Names and proper nouns are always written with a <strong>Capital Letter</strong> (e.g., <em>${currentQ.suggested}</em>).`;
+            } else {
+                feedbackElem.className = 'feedback-box correct';
+                feedbackElem.innerHTML = `<strong>Excellent!</strong> Correct answer (+10 pts).`;
+                scores[activeTeam] += 10;
+                document.getElementById(`score${activeTeam}`).innerText = scores[activeTeam];
+                wrongAttempts[rIndex] = 0;
+            }
+        } else {
+            wrongAttempts[rIndex]++;
+            
+            if (wrongAttempts[rIndex] >= 3) {
+                feedbackElem.className = 'feedback-box wrong';
+                feedbackElem.innerHTML = `<strong>Suggested Answer:</strong> ${currentQ.suggested}<br><br>💡 <em>If you think your answer is 100% correct, check with your English teacher Youssef.</em>`;
+            } else {
+                feedbackElem.className = 'feedback-box wrong';
+                feedbackElem.innerHTML = `<strong>Not quite right!</strong> Check your spelling or look closely at the text. (Attempt ${wrongAttempts[rIndex]} of 3)`;
+            }
+        }
+    }
+
+    function moveQ(type, dir) {
+        if(type === 'g') {
+            gIndex = Math.max(0, Math.min(grammarData.length - 1, gIndex + dir));
+        } else if(type === 'v') {
+            vIndex = Math.max(0, Math.min(vocabData.length - 1, vIndex + dir));
+        } else {
+            rIndex = Math.max(0, Math.min(readingData.length - 1, rIndex + dir));
+        }
+        loadQuestion(type);
+    }
+
+    function countWords() {
+        const text = document.getElementById('writing-input').value.trim();
+        const words = text ? text.split(/\s+/).length : 0;
+        document.getElementById('word-counter').innerText = `Words: ${words}`;
+    }
+
+    function submitAllResults() {
+        const writingText = document.getElementById('writing-input').value.trim();
+        const statusDiv = document.getElementById('submission-status');
+        
+        statusDiv.style.display = 'block';
+        statusDiv.style.color = 'var(--primary)';
+        statusDiv.innerText = "Submitting results to teacher...";
+
+        const formData = new FormData();
+        formData.append("access_key", "0a0f72a0-7679-4600-abcf-9ebd68532b29");
+        formData.append("subject", "Complete Game Results - " + studentNameData);
+        formData.append("Full_Name", studentNameData);
+        formData.append("Student_Group", studentGroupData);
+        formData.append("Team_1_Score", scores[1]);
+        formData.append("Team_2_Score", scores[2]);
+        formData.append("Writing_Task_Answer", writingText || "No writing provided");
+
+        fetch("https://api.web3forms.com/submit", {
+            method: "POST",
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            statusDiv.style.color = 'var(--correct)';
+            statusDiv.innerText = "Results successfully sent to teacher Youssef!";
+        })
+        .catch(err => {
+            statusDiv.style.color = 'var(--wrong)';
+            statusDiv.innerText = "Error sending results. Please inform your teacher.";
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const inputElem = document.getElementById('r-input');
+        if (inputElem) {
+            inputElem.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    checkReadingAnswer();
+                }
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
