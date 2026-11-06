@@ -281,10 +281,6 @@
             margin-bottom: 25px;
         }
 
-        @media(max-width: 600px) {
-            .options-grid { grid-template-columns: 1fr; }
-        }
-
         .opt-btn {
             padding: 15px;
             background: #f8fafc;
@@ -297,7 +293,7 @@
             transition: 0.15s;
         }
 
-        .opt-btn:hover:not(:disabled) {
+        .opt-btn.hover:not(:disabled) {
             background: #e2e8f0;
             border-color: #94a3b8;
         }
@@ -428,13 +424,57 @@
             color: #64748b;
             margin-top: 5px;
         }
+
+        /* MOBILE RESPONSIVENESS FIXES */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .header-left {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .student-badge {
+                text-align: left;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            .scoreboard {
+                grid-template-columns: 1fr;
+            }
+            .tabs {
+                flex-direction: column;
+            }
+            .tab-btn {
+                min-width: 100%;
+            }
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            .card {
+                padding: 15px;
+            }
+            .nav-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .nav-controls button {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
 
 <div class="game-container">
 
-    <!-- WELCOME LANDING SCREEN WITH WEB3FORMS INTEGRATION -->
+    <!-- WELCOME LANDING SCREEN -->
     <div id="welcome-screen">
         <div class="welcome-logo">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 104" role="img" aria-label="elbilia skolar">
@@ -460,12 +500,11 @@
         <div class="teacher-title">Teacher: Youssef Boudar</div>
 
         <div class="welcome-msg">
-            <h2>Hello & Welcome! 👋</h2>
+            <h2>Hello and Welcome</h2>
             <p>Are you ready to review for the exam?</p>
         </div>
 
         <form id="student-login-form" class="student-form" onsubmit="handleStudentStart(event)">
-            <!-- WEB3FORMS ACCESS KEY (REPLACE WITH YOUR KEY FROM WEB3FORMS.COM) -->
             <input type="hidden" name="access_key" value="0a0f72a0-7679-4600-abcf-9ebd68532b29">
             <input type="hidden" name="subject" value="New Student Started Review Game - Elbilia Skolar">
 
@@ -485,7 +524,7 @@
                 </select>
             </div>
 
-            <button type="submit" class="start-btn" id="start-btn-text">Start Review Game 🚀</button>
+            <button type="submit" class="start-btn" id="start-btn-text">Start Review Game</button>
         </form>
     </div>
 
@@ -573,16 +612,16 @@
             </div>
         </div>
 
-        <!-- READING PANEL -->
+        <!-- READING PANEL (Passages with exact targeted fill-in words mentioned) -->
         <div id="reading-panel" class="card panel" style="display: none;">
             <div class="reading-text-box">
-                <h4>Reading Text: Unexpected Discoveries</h4>
-                <p><strong>The Silver Pocket Watch:</strong> In 2018, a teenager named Lucas was diving in a shallow lake near Lyon, France, when he felt something hard under the mud. He pulled out a heavy silver pocket watch. The glass was cracked, but the metal case was intact. Engraved on the back was a date: 12 June 1944, along with the initials "P.M.". After local newspapers shared the story, the grandson of a World War II soldier contacted Lucas. The watch belonged to Pierre Martin, who lost it during a river crossing 74 years earlier.</p>
-                <p><strong>The Viking Ring:</strong> In 2021, while walking his dog along a muddy path in York, England, a man named Arthur discovered a small gold ring shining in the grass. It was decorated with intricate Viking patterns. Arthur took it to a local museum, where historians confirmed it was over 1,000 years old. The museum director, Dr. Helen Vance, stated that such rings were extremely rare in the region. Arthur was thrilled to be part of such an incredible historical find, and the ring is now displayed in the city's museum.</p>
+                <h4>Reading Text: Practice Passages</h4>
+                <p><strong>The Secret in the Sand:</strong> In 2023, a teenager named Ethan found a plastic bottle on a beach in Miami, USA. Inside was a piece of paper with a letter dated 15 July 2010. The letter was written by a boy named Noah, aged 13, from Boston, Massachusetts. The letter asked if anyone would ever find it and requested the finder to contact his school address. Noah was 26 years old when Ethan was able to contact him through social media. Ethan found the bottle only a few miles away from where Noah had dropped it into the ocean years earlier.</p>
+                <p><strong>A Message Across the Sea:</strong> In 2021, Sophia Martinez was walking along a rocky shore in Sydney, Australia, when she spotted a waterproof pouch. Inside was a postcard written in Spanish from an eight-year-old girl named Sofia from Madrid, Spain, thousands of kilometres away. She was looking for a penpal to practice writing. After the local radio broadcasted the story, the girl's family reached out to Sophia. Sofia (the writer) was now eleven years old and living in Valencia, Spain.</p>
             </div>
             <div class="q-info">
-                <span id="r-counter">Question 1 of 16</span>
-                <span id="r-category" style="color: var(--accent);">Task 1: Matching Names</span>
+                <span id="r-counter">Question 1 of 17</span>
+                <span id="r-category" style="color: var(--accent);">Reading Comprehension</span>
             </div>
             <div class="q-text" id="r-question">Loading question...</div>
 
@@ -608,6 +647,11 @@
             </div>
             <textarea id="writing-input" placeholder="Type your response here..." oninput="countWords()"></textarea>
             <div class="word-count" id="word-counter">Words: 0</div>
+            
+            <div style="margin-top: 20px; text-align: right;">
+                <button class="btn" onclick="submitAllResults()" style="background: var(--primary); padding: 12px 24px; font-size: 1rem;">Submit Final Results to Teacher</button>
+            </div>
+            <div id="submission-status" style="margin-top: 10px; font-weight: bold; text-align: right; display: none;"></div>
         </div>
     </div>
 </div>
@@ -649,116 +693,124 @@
         { q: "To put something in a secret place where nobody can see it:", opts: ["hide", "close", "appear", "include"], a: 0, cat: "Time Capsules" }
     ];
 
+    // READING QUESTIONS WITH ANSWERS 100% FOUND IN THE TEXT
     const readingData = [
         { 
-            q: "[Task 1 - Complete with Name]: _______ found the pocket watch in a lake in 2018.", 
-            keywords: ["Lucas"], 
-            suggested: "Lucas", 
+            q: "Task 1: Who is from Boston, Massachusetts?", 
+            keywords: ["Noah"], 
+            suggested: "Noah", 
             isName: true,
             cat: "Task 1: Matching Names"
         },
         { 
-            q: "[Task 1 - Complete with Name]: _______ discovered a gold ring while walking his dog in York.", 
-            keywords: ["Arthur"], 
-            suggested: "Arthur", 
+            q: "Task 1: Who found the plastic bottle on a beach in Miami in 2023?", 
+            keywords: ["Ethan"], 
+            suggested: "Ethan", 
             isName: true,
             cat: "Task 1: Matching Names"
         },
         { 
-            q: "[Task 1 - Complete with Name]: _______ wrote initials 'P.M.' and lost his watch in 1944.", 
-            keywords: ["Pierre"], 
-            suggested: "Pierre", 
+            q: "Task 1: Who wrote the postcard in Spanish from Spain?", 
+            keywords: ["Sofia"], 
+            suggested: "Sofia", 
             isName: true,
             cat: "Task 1: Matching Names"
         },
         { 
-            q: "[Task 1 - Complete with Name]: _______ confirmed that the gold ring was over 1,000 years old.", 
-            keywords: ["Helen"], 
-            suggested: "Helen", 
+            q: "Task 1: Who found the waterproof pouch in Sydney, Australia?", 
+            keywords: ["Sophia Martinez", "Sophia"], 
+            suggested: "Sophia Martinez", 
             isName: true,
             cat: "Task 1: Matching Names"
         },
         { 
-            q: "[Task 2 - Vocabulary Fill]: France is a famous country located in Western E_______.", 
-            keywords: ["Europe"], 
-            suggested: "Europe", 
-            isName: true,
-            cat: "Task 2: Text Vocabulary"
-        },
-        { 
-            q: "[Task 2 - Vocabulary Fill]: Can you send me a m_______ to give me your new phone number?", 
-            keywords: ["message"], 
-            suggested: "message", 
+            q: "Task 2: Miami is a city in the USA by the Atlantic O_______.", 
+            keywords: ["Ocean"], 
+            suggested: "Ocean", 
             isName: false,
             cat: "Task 2: Text Vocabulary"
         },
         { 
-            q: "[Task 2 - Vocabulary Fill]: Students usually bring their own water b_______ to school.", 
-            keywords: ["bottle", "bottles"], 
-            suggested: "bottle", 
+            q: "Task 2: Can you tell me the best way to c_______ him? Is it better to send a message or call?", 
+            keywords: ["contact"], 
+            suggested: "contact", 
             isName: false,
             cat: "Task 2: Text Vocabulary"
         },
         { 
-            q: "[Task 2 - Vocabulary Fill]: York is an ancient historical city in E_______.", 
-            keywords: ["England"], 
-            suggested: "England", 
-            isName: true,
+            q: "Task 2: Be careful! That bottle is made of p_______, not glass.", 
+            keywords: ["plastic"], 
+            suggested: "plastic", 
+            isName: false,
             cat: "Task 2: Text Vocabulary"
         },
         { 
-            q: "[Task 2 - Vocabulary Fill]: I need a piece of p_______ to write down my notes.", 
+            q: "Task 2: I need a piece of p_______ to write down my notes.", 
             keywords: ["paper"], 
             suggested: "paper", 
             isName: false,
             cat: "Task 2: Text Vocabulary"
         },
         { 
-            q: "[Task 3 - T/F/NG]: Arthur found the gold ring in 2018. (Type True, False, or Not Given)", 
+            q: "Task 2: Students usually bring their own water b_______ to school.", 
+            keywords: ["bottle", "bottles"], 
+            suggested: "bottle", 
+            isName: false,
+            cat: "Task 2: Text Vocabulary"
+        },
+        { 
+            q: "Task 2: Sydney is a famous city in A_______.", 
+            keywords: ["Australia"], 
+            suggested: "Australia", 
+            isName: true,
+            cat: "Task 2: Text Vocabulary"
+        },
+        { 
+            q: "Task 3 (T/F/NG): Ethan found the plastic bottle in 2021. (Type True, False, or Not Given)", 
             keywords: ["False", "false"], 
-            suggested: "False (Arthur found it in 2021)", 
+            suggested: "False (He found it in 2023)", 
             isName: false,
             cat: "Task 3: True / False / NG"
         },
         { 
-            q: "[Task 3 - T/F/NG]: Lucas found the watch in a glass jar under the ocean. (Type True, False, or Not Given)", 
-            keywords: ["False", "false"], 
-            suggested: "False (He found it under mud in a shallow lake)", 
-            isName: false,
-            cat: "Task 3: True / False / NG"
-        },
-        { 
-            q: "[Task 3 - T/F/NG]: The silver pocket watch belonged to a World War II soldier. (Type True, False, or Not Given)", 
+            q: "Task 3 (T/F/NG): Noah put his letter in a plastic bottle. (Type True, False, or Not Given)", 
             keywords: ["True", "true"], 
             suggested: "True", 
             isName: false,
             cat: "Task 3: True / False / NG"
         },
         { 
-            q: "[Task 3 - T/F/NG]: Dr. Helen Vance is the director of a museum in York. (Type True, False, or Not Given)", 
+            q: "Task 3 (T/F/NG): Noah's letter travelled across the world to another continent. (Type True, False, or Not Given)", 
+            keywords: ["False", "false"], 
+            suggested: "False (It was found a few miles away in Miami)", 
+            isName: false,
+            cat: "Task 3: True / False / NG"
+        },
+        { 
+            q: "Task 3 (T/F/NG): Sophia Martinez was riding a bicycle when she found the pouch. (Type True, False, or Not Given)", 
+            keywords: ["False", "false"], 
+            suggested: "False (She was walking along a rocky shore)", 
+            isName: false,
+            cat: "Task 3: True / False / NG"
+        },
+        { 
+            q: "Task 3 (T/F/NG): Sofia (the writer) is from Madrid, Spain. (Type True, False, or Not Given)", 
             keywords: ["True", "true"], 
             suggested: "True", 
             isName: false,
             cat: "Task 3: True / False / NG"
         },
         { 
-            q: "[Task 3 - T/F/NG]: Arthur sold the gold ring to a private collector for money. (Type True, False, or Not Given)", 
-            keywords: ["Not Given", "not given"], 
-            suggested: "Not Given", 
-            isName: false,
-            cat: "Task 3: True / False / NG"
-        },
-        { 
-            q: "[Task 4 - Open Answer]: Do you know any other real stories about people finding old objects or historical items? (Type a sentence)", 
-            keywords: ["yes", "no", "story", "found", "find", "know", "my"], 
-            suggested: "Yes, I heard a story about a fisherman who found old coins.", 
+            q: "Task 4 (Open Answer): Do you know any other real stories about people finding messages in bottles?", 
+            keywords: ["yes", "no", "story", "found", "find", "know", "friend", "beach"], 
+            suggested: "Yes, I heard a story about a fisherman who found an old letter on the beach.", 
             isName: false,
             cat: "Task 4: Open Sentence Response"
         },
         { 
-            q: "[Task 4 - Open Answer]: Did you ever find something interesting outside when you were younger? If yes, what was it? If not, what would you like to find?", 
-            keywords: ["found", "find", "would", "like", "gold", "watch", "ring", "coin", "nothing", "yes", "no"], 
-            suggested: "I would like to find an old gold coin near the beach because it is exciting.", 
+            q: "Task 4 (Open Answer): Did you write a message and put it in a bottle when you were younger? What would you write?", 
+            keywords: ["would", "like", "write", "message", "bottle", "yes", "no", "name"], 
+            suggested: "I would like to write a message saying hello and put my email address inside.", 
             isName: false,
             cat: "Task 4: Open Sentence Response"
         }
@@ -770,20 +822,20 @@
     let activeTeam = 1;
     let scores = { 1: 0, 2: 0 };
     let wrongAttempts = {};
+    let studentNameData = "";
+    let studentGroupData = "";
 
-    // Web3Forms Submission & App Entry
     function handleStudentStart(event) {
         event.preventDefault();
         const form = document.getElementById('student-login-form');
-        const nameInput = document.getElementById('fullname').value.trim();
-        const groupInput = document.getElementById('group').value;
+        studentNameData = document.getElementById('fullname').value.trim();
+        studentGroupData = document.getElementById('group').value;
         const btnText = document.getElementById('start-btn-text');
 
-        if (!nameInput || !groupInput) return;
+        if (!studentNameData || !studentGroupData) return;
 
         btnText.innerText = "Connecting...";
 
-        // Send data to Web3Forms asynchronously
         fetch("https://api.web3forms.com/submit", {
             method: "POST",
             body: new FormData(form)
@@ -796,11 +848,9 @@
             console.error("Web3Forms error:", err);
         })
         .finally(() => {
-            // Update Header Display
-            document.getElementById('display-student-name').innerText = nameInput;
-            document.getElementById('display-student-group').innerText = groupInput;
+            document.getElementById('display-student-name').innerText = studentNameData;
+            document.getElementById('display-student-group').innerText = studentGroupData;
 
-            // Transition Screens
             document.getElementById('welcome-screen').style.display = 'none';
             document.getElementById('app-screen').style.display = 'block';
 
@@ -965,6 +1015,38 @@
         const text = document.getElementById('writing-input').value.trim();
         const words = text ? text.split(/\s+/).length : 0;
         document.getElementById('word-counter').innerText = `Words: ${words}`;
+    }
+
+    function submitAllResults() {
+        const writingText = document.getElementById('writing-input').value.trim();
+        const statusDiv = document.getElementById('submission-status');
+        
+        statusDiv.style.display = 'block';
+        statusDiv.style.color = 'var(--primary)';
+        statusDiv.innerText = "Submitting results to teacher...";
+
+        const formData = new FormData();
+        formData.append("access_key", "0a0f72a0-7679-4600-abcf-9ebd68532b29");
+        formData.append("subject", "Complete Game Results - " + studentNameData);
+        formData.append("Full_Name", studentNameData);
+        formData.append("Student_Group", studentGroupData);
+        formData.append("Team_1_Score", scores[1]);
+        formData.append("Team_2_Score", scores[2]);
+        formData.append("Writing_Task_Answer", writingText || "No writing provided");
+
+        fetch("https://api.web3forms.com/submit", {
+            method: "POST",
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            statusDiv.style.color = 'var(--correct)';
+            statusDiv.innerText = "Results successfully sent to teacher Youssef!";
+        })
+        .catch(err => {
+            statusDiv.style.color = 'var(--wrong)';
+            statusDiv.innerText = "Error sending results. Please inform your teacher.";
+        });
     }
 
     document.addEventListener('DOMContentLoaded', () => {
